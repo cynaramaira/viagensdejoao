@@ -597,6 +597,34 @@
             region: "Agreste",
             details: "João vai começar essa segunda semana como pré-candidato em Gravatá, avançando sobre território adversário.",
             svgId: "gravata"
+        },
+        {
+            date: "13 de abril",
+            location: "Agrestina",
+            region: "Agreste",
+            details: "João visita Agrestina, fortalecendo alianças e ampliando sua base no Agreste.",
+            svgId: "agrestina"
+        },
+        {
+            date: "13 de abril",
+            location: "Vitória de Santo Antão",
+            region: "Zona da Mata",
+            details: "A agenda segue para Vitória de Santo Antão, polo estratégico da Zona da Mata.",
+            svgId: "vitoria_de_santo_antao"
+        },
+        {
+            date: "14 de abril",
+            location: "Recife",
+            region: "RMR",
+            details: "Retorno à capital pernambucana para reuniões e articulações políticas.",
+            svgId: "recife"
+        },
+        {
+            date: "17 a 26 de abril",
+            location: "Exterior",
+            region: "Internacional",
+            details: "Viagem particular ao exterior acompanhado de Tabata Amaral, com retorno previsto para domingo (26).",
+            svgId: "exterior"
         }
     ];
 
@@ -614,6 +642,11 @@
 
     // Pega o centro exato da cidade renderizada usando GetBoundingClientRect
     function getCoords(svgId) {
+        if (svgId === 'exterior') {
+            // Joga o avatar para fora da tela (simulando viagem internacional)
+            return { x: 150, y: -50 };
+        }
+
         const pathElement = document.getElementById(svgId);
         if (!pathElement) {
             console.warn("Cidade não encontrada no SVG: " + svgId);
@@ -633,10 +666,15 @@
     function updateDots() {
         const dots = document.querySelectorAll('.city-dot');
         itinerary.forEach((item, index) => {
-            const coords = getCoords(item.svgId);
             if (dots[index]) {
-                dots[index].style.left = coords.x + '%';
-                dots[index].style.top = coords.y + '%';
+                if (item.svgId === 'exterior') {
+                    dots[index].style.display = 'none'; // Esconde o ponto no mapa
+                } else {
+                    const coords = getCoords(item.svgId);
+                    dots[index].style.display = 'block';
+                    dots[index].style.left = coords.x + '%';
+                    dots[index].style.top = coords.y + '%';
+                }
             }
         });
     }
