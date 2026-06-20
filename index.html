@@ -3,210 +3,426 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Giro de João Campos - Pernambuco 2026</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Giro de João Campos – Pernambuco 2026</title>
     <style>
         :root {
-            --jamildo-orange: #f83d03;
-            --jamildo-blue: #024796;
-            --bg-light: #f9f9f9;
+            --orange: #f83d03;
+            --blue: #024796;
+            --blue-dark: #01305e;
+            --bg: #f5f7fa;
+        }
+
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
         }
 
         body {
-            margin: 0;
-            padding: 0;
-            background-color: var(--bg-light);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow: hidden;
+            background: var(--bg);
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
         }
 
-        #infographic-container {
-            width: 500px;
+        /* CONTAINER FIXO EM 600X600 */
+        #wrap {
+            width: 600px;
             height: 600px;
-            position: relative;
             background: #fff;
-            border: 1px solid #ddd;
+            border: 1px solid #dde3ec;
+            overflow: hidden;
             display: flex;
             flex-direction: column;
-            user-select: none;
-            margin: 0 auto;
+            box-shadow: 0 4px 20px rgba(0,0,0,.08);
         }
 
-        .header {
-            background: white;
-            padding: 10px;
-            border-bottom: 2px solid var(--jamildo-orange);
+        .hdr {
+            background: #fff;
+            border-bottom: 3px solid var(--orange);
+            padding: 8px 16px;
             display: flex;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
         }
 
-        .header img {
-            height: 40px;
+        .hdr img { 
+            height: 32px; 
         }
 
-        /* Área do Mapa */
+        /* ÁREA DO MAPA AJUSTADA PARA O LAYOUT FIXO */
         #map-area {
-            flex-grow: 1;
             position: relative;
-            background: #f0f4f8;
+            background: #e8eff6;
             overflow: hidden;
+            height: 340px; 
+            flex-shrink: 0;
         }
 
-        /* CONTAINER PARA O SVG EXTERNO */
         #svg-map-container {
             position: absolute;
-            top: 0;
-            left: 0;
+            inset: 0;
+            z-index: 1;
             width: 100%;
             height: 100%;
-            z-index: 1;
         }
 
-        /* Representação do João Campos */
-        #joao-avatar {
-            position: absolute;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            border: 3px solid var(--jamildo-orange);
-            background-image: url('joao-campos.jpg');
-            background-size: cover;
-            background-position: center;
-            z-index: 10;
-            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-            transform: translate(-50%, -50%);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            background-color: #ccc;
+        #svg-map-container svg {
+            width: 100%;
+            height: 100%;
         }
 
-        /* Aviãozinho decorativo */
-        #joao-avatar::after {
-            content: '✈️';
-            position: absolute;
-            top: -10px;
-            right: -10px;
-            font-size: 20px;
-            background: white;
-            border-radius: 50%;
-            padding: 2px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }
-
-        /* Card de Informação */
-        #info-card {
-            position: absolute;
-            bottom: 20px;
-            left: 20px;
-            right: 20px;
-            background: rgba(2, 71, 150, 0.95);
-            color: white;
-            padding: 15px;
-            border-radius: 8px;
-            border-left: 5px solid var(--jamildo-orange);
-            z-index: 20;
-            transition: opacity 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-
-        .date-label {
-            font-weight: bold;
-            color: var(--jamildo-orange);
-            text-transform: uppercase;
-            font-size: 0.75rem;
-            margin-bottom: 3px;
-        }
-
-        .location-label {
-            font-size: 1.05rem;
-            font-weight: 800;
-            margin-bottom: 5px;
-            line-height: 1.2;
-        }
-
-        .details-text {
-            font-size: 0.85rem;
-            line-height: 1.3;
-        }
-
-        /* Controles Inferiores */
-        .controls {
-            padding: 15px;
-            background: white;
-            border-top: 1px solid #eee;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .nav-btn {
-            background: var(--jamildo-blue);
-            color: white;
-            border: none;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.2s;
-        }
-
-        .nav-btn:hover {
-            background: var(--jamildo-orange);
-        }
-
-        .nav-btn:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-        }
-
-        input[type=range] {
-            flex-grow: 1;
-            accent-color: var(--jamildo-orange);
-            cursor: pointer;
-        }
-
-        /* Marcadores das cidades */
-        .city-dot {
-            position: absolute;
-            width: 8px;
-            height: 8px;
-            background: var(--jamildo-blue);
-            border: 1.5px solid white;
-            border-radius: 50%;
-            z-index: 5;
-            transform: translate(-50%, -50%);
-            opacity: 0.6;
-        }
-
-        /* Estilos dinâmicos para destacar a cidade atual no SVG */
         #svg-map-container path, #svg-map-container g {
             transition: fill 0.3s ease, stroke-width 0.3s ease;
         }
+
+        /* ESTILOS DINÂMICOS PARA DESTAQUE NO MAPA */
         #svg-map-container path.active,
         #svg-map-container g.active path {
-            fill: var(--jamildo-orange) !important;
-            stroke: var(--jamildo-blue) !important;
-            stroke-width: 2.5px !important;
+            fill: var(--orange) !important;
+            stroke: var(--blue) !important;
+            stroke-width: 3px !important;
             stroke-opacity: 1 !important;
+        }
+
+        .city-dot {
+            position: absolute;
+            width: 8px; 
+            height: 8px;
+            background: var(--blue);
+            border: 1.5px solid #fff;
+            border-radius: 50%;
+            z-index: 5;
+            transform: translate(-50%, -50%);
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        #joao-avatar {
+            position: absolute;
+            width: 46px; 
+            height: 46px;
+            border-radius: 50%;
+            border: 3px solid var(--orange);
+            background-image: url('joao-campos.jpg');
+            background-size: cover;
+            background-position: center;
+            background-color: #aab8cc;
+            z-index: 10;
+            transition: left .75s cubic-bezier(.4,0,.2,1), top .75s cubic-bezier(.4,0,.2,1);
+            transform: translate(-50%, -50%);
+            box-shadow: 0 3px 10px rgba(0,0,0,.25);
+        }
+
+        #joao-avatar::after {
+            content: '✈️';
+            position: absolute;
+            top: -8px; 
+            right: -8px;
+            font-size: 14px;
+            background: #fff;
+            border-radius: 50%;
+            padding: 1px;
+            box-shadow: 0 1px 4px rgba(0,0,0,.2);
+        }
+
+        #info-card {
+            position: absolute;
+            bottom: 10px; 
+            left: 10px; 
+            right: 10px;
+            background: rgba(1, 48, 94, 0.94);
+            color: #fff;
+            padding: 10px 12px;
+            border-radius: 6px;
+            border-left: 4px solid var(--orange);
+            z-index: 20;
+            transition: opacity .2s;
+            box-shadow: 0 4px 12px rgba(0,0,0,.15);
+        }
+
+        .card-meta {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 2px;
+        }
+
+        .card-date {
+            font-size: .62rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            color: #ffb085;
+        }
+
+        .card-region {
+            font-size: .58rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .04em;
+            padding: 1px 6px;
+            border-radius: 10px;
+            background: rgba(255,255,255,.12);
+            color: rgba(255,255,255,.8);
+        }
+
+        .card-location {
+            font-size: .95rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 3px;
+        }
+
+        .card-details {
+            font-size: .72rem;
+            line-height: 1.35;
+            opacity: .9;
+        }
+
+        /* PAINEL DE NAVEGAÇÃO INFERIOR */
+        #nav-panel {
+            background: #fff;
+            border-top: 1px solid #dde3ec;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        #month-bar {
+            display: flex;
+            border-bottom: 1px solid #dde3ec;
+            overflow-x: auto;
+            scrollbar-width: none;
+            flex-shrink: 0;
+        }
+
+        #month-bar::-webkit-scrollbar { 
+            display: none; 
+        }
+
+        .month-btn {
+            flex-shrink: 0;
+            padding: 0 14px;
+            height: 34px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: .7rem;
+            font-weight: 600;
+            color: #7a8ea8;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            position: relative;
+            transition: color .15s;
+        }
+
+        .month-btn::after {
+            content: '';
+            position: absolute;
+            bottom: 0; 
+            left: 10px; 
+            right: 10px;
+            height: 2px;
+            background: var(--orange);
+            border-radius: 2px 2px 0 0;
+            transform: scaleX(0);
+            transition: transform .2s;
+        }
+
+        .month-btn:hover, .month-btn.active { 
+            color: var(--blue); 
+        }
+
+        .month-btn.active::after { 
+            transform: scaleX(1); 
+        }
+
+        .month-btn .mc {
+            display: inline-block;
+            background: #e8eef7;
+            color: var(--blue);
+            font-size: .55rem;
+            font-weight: 700;
+            padding: 1px 4px;
+            border-radius: 10px;
+            margin-left: 4px;
+        }
+
+        .month-btn.active .mc {
+            background: var(--orange);
+            color: #fff;
+        }
+
+        #stops-list {
+            flex: 1;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #ccd6e6 transparent;
+        }
+
+        #stops-list::-webkit-scrollbar { 
+            width: 4px; 
+        }
+        
+        #stops-list::-webkit-scrollbar-thumb { 
+            background: #ccd6e6; 
+            border-radius: 4px; 
+        }
+
+        .stop-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 14px;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f3f8;
+            transition: background .12s;
+        }
+
+        .stop-row:last-child { 
+            border-bottom: none; 
+        }
+        
+        .stop-row:hover { 
+            background: #f5f8fd; 
+        }
+        
+        .stop-row.active {  
+            background: #eef3fb;
+        }
+
+        .stop-dot-ui {
+            width: 8px; 
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            border: 2px solid #c8d4e4;
+            background: #fff;
+        }
+
+        .stop-row.visited .stop-dot-ui {
+            background: #ffb085;
+            border-color: var(--orange);
+        }
+
+        .stop-row.active .stop-dot-ui {
+            background: var(--orange);
+            border-color: var(--blue);
+            box-shadow: 0 0 0 2px rgba(248,61,3,.2);
+        }
+
+        .stop-info { 
+            flex: 1; 
+            min-width: 0; 
+        }
+
+        .stop-info-date {
+            font-size: .6rem;
+            font-weight: 700;
+            color: #8a9db8;
+            text-transform: uppercase;
+        }
+
+        .stop-row.active .stop-info-date { 
+            color: var(--orange); 
+        }
+
+        .stop-info-loc {
+            font-size: .78rem;
+            font-weight: 600;
+            color: #1a2a40;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .stop-region-pill {
+            font-size: .55rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 2px 6px;
+            border-radius: 10px;
+            flex-shrink: 0;
+            color: #fff;
+        }
+
+        #footer-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 14px;
+            border-top: 1px solid #dde3ec;
+            background: #fff;
+            flex-shrink: 0;
+        }
+
+        .nav-btn {
+            width: 26px; 
+            height: 26px;
+            border-radius: 50%;
+            border: none;
+            background: var(--blue);
+            color: #fff;
+            cursor: pointer;
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .nav-btn:hover { 
+            background: var(--orange); 
+        }
+        
+        .nav-btn:disabled { 
+            background: #ccd6e6; 
+            cursor: default; 
+        }
+
+        .nav-btn svg { 
+            width: 12px; 
+            height: 12px; 
+        }
+
+        #progress-track {
+            flex: 1;
+            height: 4px;
+            background: #dde3ec;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        #progress-fill {
+            height: 100%;
+            background: var(--orange);
+            width: 0%;
+            transition: width .3s ease;
+        }
+
+        #counter-lbl {
+            font-size: .65rem;
+            color: #7a8ea8;
+            flex-shrink: 0;
+        }
+
+        #counter-lbl strong { 
+            color: var(--blue); 
         }
     </style>
 </head>
 <body>
 
-<div id="infographic-container">
-    <div class="header">
+<div id="wrap">
+    <div class="hdr">
         <img src="https://jamildo.com/media/uploads/logojamildo.png" alt="Jamildo.com">
     </div>
 
     <div id="map-area">
-        <!-- 
-             ESPAÇO PARA O SEU SVG ABAIXO 
-             Dica: Cole o código <svg> dentro desta div. 
-             Mantenha as propriedades width="100%" e height="100%".
-        -->
         <div id="svg-map-container">
             <svg id="mapa-pe" width="100%" height="100%" viewBox="0 0 1902 819" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <g id="map_for_cover" filter="url(#filter0_d_2_226)">
@@ -499,580 +715,294 @@
         <div id="joao-avatar"></div>
 
         <div id="info-card">
-            <div id="card-date" class="date-label"></div>
-            <div id="card-location" class="location-label"></div>
-            <div id="card-details" class="details-text"></div>
+            <div class="card-meta">
+                <span class="card-date" id="card-date"></span>
+                <span class="card-region" id="card-region"></span>
+            </div>
+            <div class="card-location" id="card-location"></div>
+            <div class="card-details" id="card-details"></div>
         </div>
     </div>
 
-    <div class="controls">
-        <button id="prevBtn" class="nav-btn" title="Voltar">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
-        </button>
-        
-        <input type="range" id="dateRange" min="0" max="10" value="0">
-        
-        <button id="nextBtn" class="nav-btn" title="Avançar">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
-        </button>
+    <div id="nav-panel">
+        <div id="month-bar"></div>
+        <div id="stops-list"></div>
+        <div id="footer-bar">
+            <button id="prevBtn" class="nav-btn" disabled>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+            <div id="progress-track"><div id="progress-fill"></div></div>
+            <span id="counter-lbl"></span>
+            <button id="nextBtn" class="nav-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+            </button>
+        </div>
     </div>
 </div>
 
 <script>
-    // Itinerário da pré-campanha 2026
+    const REGION_COLORS = {
+        "Agreste":      "#0a7c3e",
+        "Sertão":       "#b45c07",
+        "RMR":          "#024796",
+        "Zona da Mata": "#6b2fa0",
+        "Mata Sul":     "#0f7a72",
+        "Federal":      "#555",
+        "Internacional":"#888",
+    };
+
+    // Estrutura unificada com os dados de todas as viagens para fácil edição manual
     const itinerary = [
-        {
-            date: "03 de abril",
-            location: "Brejo da Madre de Deus",
-            region: "Agreste",
-            details: "João visita município liderado por prefeito aliado de Raquel Lyra. O pré-candidato busca fortalecer a base de oposição local.",
-            svgId: "brejo_da_madre_de_deus"
-        },
-        {
-            date: "04 de abril",
-            location: "Bonito",
-            region: "Agreste",
-            details: "A agenda no Agreste contempla cidade comandada por prefeito aliado direto do ex-prefeito do Recife.",
-            svgId: "bonito"
-        },
-        {
-            date: "06 de abril",
-            location: "Araripina",
-            region: "Sertão",
-            details: "No Sertão do Araripe, João encontra prefeito aliado para consolidar forças na região estratégica.",
-            svgId: "araripina"
-        },
-        {
-            date: "07 de abril",
-            location: "Ipubi e Ouricuri",
-            region: "Sertão",
-            details: "O giro pelo Sertão inclui a filiação de prefeito que pertencia à base de Raquel Lyra e visita a reduto governista.",
-            svgId: "ouricuri"
-        },
-        {
-            date: "08 de abril",
-            location: "Serra Talhada",
-            region: "Sertão",
-            details: "João marca presença no Sertão do Pajeú ao lado de prefeita aliada. Ele mantém hegemonia em polos regionais importantes.",
-            svgId: "serra_talhada"
-        },
-        {
-            date: "09 de abril",
-            location: "Recife e Brasília",
-            region: "RMR / Federal",
-            details: "O político retorna ao Recife para homenagem ao pai e viaja à Brasília para tratar de questões nacionais do PSB.",
-            svgId: "recife"
-        },
-        {
-            date: "10 de abril",
-            location: "Tabira",
-            region: "Sertão",
-            details: "Visita ao reduto de Carlos Veras. O município possui prefeito do PT que atualmente apoia a governadora Raquel Lyra.",
-            svgId: "tabira"
-        },
-        {
-            date: "11 de abril",
-            location: "Afogados da Ingazeira",
-            region: "Sertão",
-            details: "João consolida base sertaneja em encontro com prefeito aliado histórico da Frente Popular.",
-            svgId: "afogados_da_ingazeira"
-        },
-        {
-            date: "12 de abril (Manhã)",
-            location: "Arcoverde",
-            region: "Sertão",
-            details: "Na Festa da Misericórdia, o pré-candidato visita cidade gerida por aliado da governadora Raquel Lyra.",
-            svgId: "arco_verde"
-        },
-        {
-            date: "12 de abril (Tarde)",
-            location: "Canhotinho",
-            region: "Agreste",
-            details: "O giro pelo Agreste Meridional termina em visita à prefeita aliada da base socialista.",
-            svgId: "canhotinho"
-        },
-        {
-            date: "13 de abril",
-            location: "Gravatá",
-            region: "Agreste",
-            details: "João vai começar essa segunda semana como pré-candidato em Gravatá, avançando sobre território adversário.",
-            svgId: "gravata"
-        },
-        {
-            date: "13 de abril",
-            location: "Agrestina",
-            region: "Agreste",
-            details: "João visita Agrestina, fortalecendo alianças e ampliando sua base no Agreste.",
-            svgId: "agrestina"
-        },
-        {
-            date: "13 de abril",
-            location: "Vitória de Santo Antão",
-            region: "Zona da Mata",
-            details: "A agenda segue para Vitória de Santo Antão, polo estratégico da Zona da Mata.",
-            svgId: "vitoria_de_santo_antao"
-        },
-        {
-            date: "14 de abril",
-            location: "Recife",
-            region: "RMR",
-            details: "Retorno à capital pernambucana para reuniões e articulações políticas.",
-            svgId: "recife"
-        },
-        {
-            date: "17 a 26 de abril",
-            location: "Exterior",
-            region: "Internacional",
-            details: "Viagem particular ao exterior acompanhado de Tabata Amaral, com retorno previsto para domingo (26).",
-            svgId: "exterior"
-        },
-        {
-            date: "30 de abril",
-            location: "Garanhuns",
-            region: "Agreste",
-            details: "João Campos recebe o título de cidadão garanhuense, visita as obras do Hospital do Amor e participa do Festival Viva Garanhuns ao lado do prefeito aliado Sivaldo Albino.",
-            svgId: "garanhuns"
-        },
-        {
-            date: "02 de maio",
-            location: "Goiana",
-            region: "Zona da Mata",
-            details: "João suspende as agendas festivas de 1º de maio devido ao caos das fortes chuvas que afetaram Pernambuco e acompanha a situação a partir de Goiana.",
-            svgId: "goiana"
-        },
-        {
-            date: "04 de maio",
-            location: "Brasília",
-            region: "Federal",
-            details: "Viagem a Brasília em meio à mobilização nacional para tratar das ações ligadas às chuvas.",
-            svgId: "exterior"
-        },
-        {
-            date: "05 de maio",
-            location: "Recife",
-            region: "RMR",
-            details: "Retorno a Pernambuco, permanecendo no Recife para receber apoios de políticos e focar nas articulações.",
-            svgId: "recife"
-        },
-        {
-            date: "08 de maio",
-            location: "Santa Cruz do Capibaribe",
-            region: "Agreste",
-            details: "João visita Santa Cruz do Capibaribe, importante polo de confecções do Agreste e local liderado por aliado de Raquel Lyra",
-            svgId: "santa_cruz_do_capibaribe"
-        },
-        {
-            date: "09 de maio",
-            location: "Surubim e Limoeiro",
-            region: "Agreste",
-            details: "João visita Surubim e Limoeiro, cidades do Agreste aliadas de Raquel Lyra, junto com Humberto Costa.",
-            svgId: "surubim"
-        },
-        {
-            date: "10 de maio",
-            location: "Tracunhaém",
-            region: "Zona da Mata",
-            details: "João visita feira regional de artesanato e destaca histórico familiar, junto com Carlos Costa.",
-            svgId: "tracunhaem" 
-        },
-         {
-            date: "14 de maio",
-            location: "Abreu e Lima",
-            region: "RMR",
-            details: "João comparece ao aniversário do município de Abreu e Lima.",
-            svgId: "abreu_e_lima" 
-        },
-           {
-            date: "15 de maio",
-            location: "Recife",
-            region: "RMR",
-            details: "João participa de entrega da duplicação da Ladeira da COHAB.",
-            svgId: "recife" 
-        },
-          {
-            date: "16 de maio",
-            location: "Carpina",
-            region: "Zona da Mata",
-            details: "João vai a Carpina para encontrar com figuras políticas da região.",
-            svgId: "carpina" 
-        },
-         {
-            date: "16 de maio",
-            location: "Recife",
-            region: "RMR",
-            details: "João participa de plenária da senadora Teresa Leitão.",
-            svgId: "recife" 
-        },
-            {
-            date: "16 de maio",
-            location: "São Lourenço da Mata",
-            region: "RMR",
-            details: "João participa de ato de apoio liderado pelo prefeito Vinicius Labanca.",
-            svgId: "sao_lourenco_da_mata" 
-        },
-        {
-            date: "17 de maio",
-            location: "Nazaré da Mata",
-            region: "Zona da Mata",
-            details: "João visita a cidade no aniversário de 193 anos do município.",
-            svgId: "nazare_da_mata" 
-        },
-        {
-            date: "17 de maio",
-            location: "Bom Jardim",
-            region: "Zona da Mata",
-            details: "João participa de posse do do Sindicato dos Trabalhadores e Trabalhadoras Rurais (STR) de Bom Jardim.",
-            svgId: "bom_jardim" 
-        },
-        {
-            date: "18 de maio",
-            location: "Recife",
-            region: "RMR",
-            details: "João participa de entrevista na CBN, com participação de Jamildo Melo",
-            svgId: "recife" 
-        },
-        {
-            date: "19 de maio",
-            location: "Lajedo",
-            region: "Agreste",
-            details: "João participa de comemoração de aniversário da cidade, inauguração de escola municipal com prefeito aliado",
-            svgId: "lajedo" 
-        },
-        {
-            date: "19 de maio",
-            location: "Jupi",
-            region: "Agreste",
-            details: "João vai para comemoração da cidade com prefeita Rivalda Freire, do PSD de Raquel, mas que declarou apoio ao socialista",
-            svgId: "jupi" 
-        },
-        {
-            date: "21 de maio",
-            location: "Olinda",
-            region: "RMR",
-            details: "João Campos visita Mercado em Olinda com Vinicius Castello, Eugênia Lima, Marília Arraes e Carlos Costa",
-            svgId: "olinda" 
-        },
-        {
-            date: "23 de maio",
-            location: "Dormentes",
-            region: "Sertão",
-            details: "João Campos visita o Caprishow",
-            svgId: "dormentes" 
-        },
-        {
-            date: "29 de maio",
-            location: "Serra Talhada",
-            region: "Sertão",
-            details: "João Campos participou de entregas do Governo Federal e mandou recado de Lula, afirmando que o presidente deve vir em breve fazer campanha ao seu lado em Pernambuco",
-            svgId: "serra_talhada" 
-        },
-        {
-            date: "30 de maio",
-            location: "Salgueiro",
-            region: "Sertão",
-            details: "Em visita para cidade de Salgueiro defendeu que o estado assuma a Transnordestina",
-            svgId: "salgueiro" 
-        },
-        {
-            date: "31 de maio",
-            location: "São José do Belmonte",
-            region: "Sertão",
-            details: "João Campos participa da cavalgada à Pedra do Reino junto com a esposa e aliados. A terra é liderada pelo irmão de Victor Marques, Vinicius Marques",
-            svgId: "sao_jose_do_belmonte" 
-        },
-        {
-            date: "04 de junho",
-            location: "Tamandaré e Recife",
-            region: "Mata Sul",
-            details: "João Campos faz entregas para saúde e falou sobre a necessidade de duplicar a PE-60. Antes teve reunião no Recife com empresários da Fiepe",
-            svgId: "tamandare" 
-        },
-        {
-            date: "05 de junho",
-            location: "Pedra e Jaboatão dos Guararapes",
-            region: "Agreste e RMR",
-            details: "Em Pedra, promete pavimentação da PE-244 junto ao prefeito aliado Junior Vaz. João Campos consegue apoio de vereadores da base de Raquel e visita o Mercado das Mangueiras, em Prazeres",
-            svgId: "pedra" 
-        },
-        {
-            date: "05 de junho",
-                location: "São Bento do Una",
-            region: "Agreste",
-            details: "João Campos recebe titulo de cidadão da cidade do aliado Alexandre Batité (MDB) ",
-            svgId: "sao_bento_do_una" 
-        },
-        {
-            date: "06 de junho",
-            location: "Bom Conselho",
-            region: "Agreste",
-            details: "Anuncia proposta para rede de atendimento a crianças neurodivergentes",
-            svgId: "bom_conselho" 
-        },
-        {
-            date: "06 de junho",
-            location: "Angelim",
-            region: "Agreste",
-            details: "Recebe o título de cidadão de Angelim e promete fazer um polo de um futuro Embarque Digital de Pernambuco na região",
-            svgId: "angelim" 
-        },
-        {
-            date: "06 de junho",
-            location: "Jatobá",
-            region: "Agreste",
-            details: "Reúne palanque de oposição da cidade e defende maior apoio à piscicultura",
-            svgId: "angelim" 
-        },
-        {
-            date: "06 de junho",
-            location: "Petrolândia",
-            region: "Sertão",
-            details: "Propõe Hospital Regional em Petrolândia. Ao lado do prefeito Fabiano Marques participa de entregas administrativas",
-            svgId: "petrolandia" 
-        },
-        {
-            date: "07 de junho",
-            location: "Petrolândia, Betânia, Flores e Inajá",
-            region: "Agreste",
-            details: "Foi recepcionado pelo prefeito Bebe Água (PSB) em Betânia",
-            svgId: "betania" 
-        },
-        {
-            date: "08 de junho",
-            location: "Itaíba e Águas Belas",
-            region: "Agreste",
-            details: "Ainda fará passagens",
-            svgId: "itaiba" 
-        },
-        {
-        date: "08 de junho",
-        location: "Paulista",
-        region: "RMR",
-        details: "João Campos recebe o título de cidadão paulistense em evento que reuniu diversas lideranças do Litoral Norte. O pré-candidato criticou o fechamento de hospitais e defendeu investimentos para a Região Metropolitana.",
-        svgId: "paulista"
-        },
-        {
-        date: "10 de junho",
-        location: "Recife",
-        region: "RMR",
-        details: "O presidente nacional do PSB filiou mais de 100 lideranças sindicais de várias categorias profissionais em ato na capital. O evento debateu o fortalecimento dos direitos sociais e o fim da escala 6x1.",
-        svgId: "recife"
-        },
-        {
-        date: "10 de junho",
-        location: "Recife",
-        region: "RMR",
-        details: "João Campos se reuniu com trabalhadores portuários no Sindestiva para debater o fortalecimento do setor. O político defendeu que o Governo do Estado assuma as obras da Ferrovia Transnordestina.",
-        svgId: "recife"
-        },
-        {
-        date: "11 de junho",
-        location: "Cabo de Santo Agostinho",
-        region: "RMR",
-        details: "O pré-candidato participou do lançamento da postulação de Batista Cabral ao lado do prefeito Lula Cabral. João prometeu a duplicação da PE-28 e a expansão do Embarque Digital para o Litoral Sul.",
-        svgId: "cabo_de_santo_agostinho"
-        },
-        {
-        date: "12 de junho",
-        location: "Ipojuca e Recife",
-        region: "RMR",
-        details: "João acompanhou o vice-presidente Geraldo Alckmin na inauguração de um novo terminal elétrico no Porto de Suape. Os políticos também assinaram ordens de serviço para obras de macrodrenagem na capital pernambucana.",
-        svgId: "ipojuca"
-        },
-        {
-        date: "15 de junho",
-        location: "Gravatá",
-        region: "Agreste",
-        details: "O socialista lançou a plataforma colaborativa Chega Junto Pernambuco em grande ato político no Agreste. O evento contou com a exibição de um vídeo de apoio gravado pelo presidente Lula.",
-        svgId: "gravata"
-        },
-        {
-        date: "16 de junho",
-        location: "Belo Jardim",
-        region: "Agreste",
-        details: "João Campos cumpriu agendas e concedeu entrevista em rádio local cobrando a duplicação da BR-232. O político prometeu a instalação de um polo de formação em tecnologia no município.",
-        svgId: "belo_jardim"
-        },
-        {
-        date: "16 de junho",
-        location: "Arcoverde",
-        region: "Sertão",
-        details: "O pré-candidato participou do lançamento da Frente das Oposições ao lado de ex-prefeitos e vereadores da cidade. O grupo político cobrou investimentos estaduais em infraestrutura e saúde na região.",
-        svgId: "arco_verde"
-        },
-        {
-        date: "18 de junho",
-        location: "Bezerros",
-        region: "Agreste",
-        details: "Representantes de 21 sindicatos rurais declararam apoio ao projeto da Frente Popular em ato político. João Campos defendeu a reestruturação da agricultura familiar e a reorganização do IPA.",
-        svgId: "bezerros"
-        },
-        {
-        date: "18 de junho",
-        location: "Recife",
-        region: "RMR",
-        details: "João participou da entrega de obras de contenção de encostas e recebeu homenagem póstuma direcionada ao seu pai no CRCN. As agendas contaram com a presença do prefeito Victor Marques.",
-        svgId: "recife"
-        },
-        {
-        date: "19 de junho",
-        location: "Exu",
-        region: "Sertão",
-        details: "O político iniciou o giro sertanejo propondo a criação dos Jogos Escolares da Cultura Pernambucana no Museu do Gonzagão. O ato também marcou a entrega de maquinários agrícolas para produtores rurais.",
-        svgId: "exu"
-        },
-        {
-        date: "19 de junho",
-        location: "Trindade",
-        region: "Sertão",
-        details: "João Campos unificou os discursos das lideranças oposicionistas locais durante caminhada no Sertão do Araripe. O pré-candidato assumiu compromissos com a ampliação de adutoras locais e segurança pública.",
-        svgId: "trindade"
-        },
-        {
-        date: "19 de junho",
-        location: "Araripina",
-        region: "Sertão",
-        details: "O pré-candidato esteve no polo junino da cidade ao lado do prefeito Evilásio Mateus e de lideranças da Frente Popular. João realizou reuniões políticas e acompanhou a partida da seleção brasileira de futebol.",
-        svgId: "araripina"
-        }
+        { date: "03 abr", month: "Abril", location: "Brejo da Madre de Deus", region: "Agreste", svgId: "brejo_da_madre_de_deus", details: "João visita município liderado por prefeito aliado de Raquel Lyra, buscando fortalecer a base de oposição local." },
+        { date: "04 abr", month: "Abril", location: "Bonito", region: "Agreste", svgId: "bonito", details: "A agenda no Agreste contempla cidade comandada por prefeito aliado direto do ex-prefeito do Recife." },
+        { date: "06 abr", month: "Abril", location: "Araripina", region: "Sertão", svgId: "araripina", details: "No Sertão do Araripe, João encontra prefeito aliado para consolidar forças na região estratégica." },
+        { date: "07 abr", month: "Abril", location: "Ipubi e Ouricuri", region: "Sertão", svgId: "ouricuri", details: "O giro inclui filiação de prefeito que pertencia à base de Raquel Lyra e visita a reduto governista." },
+        { date: "08 abr", month: "Abril", location: "Serra Talhada", region: "Sertão", svgId: "serra_talhada", details: "João marca presença no Sertão do Pajeú ao lado de prefeita aliada, mantendo hegemonia em polos regionais." },
+        { date: "09 abr", month: "Abril", location: "Recife e Brasília", region: "RMR", svgId: "recife", details: "Retorno ao Recife para homenagem ao pai e viagem à Brasília para tratar de questões nacionais do PSB." },
+        { date: "10 abr", month: "Abril", location: "Tabira", region: "Sertão", svgId: "tabira", details: "Visita ao reduto de Carlos Veras. O município possui prefeito do PT que apoia a governadora Raquel Lyra." },
+        { date: "11 abr", month: "Abril", location: "Afogados da Ingazeira", region: "Sertão", svgId: "afogados_da_ingazeira", details: "João consolida base sertaneja em encontro com prefeito aliado histórico da Frente Popular." },
+        { date: "12 abr manhã", month: "Abril", location: "Arcoverde", region: "Sertão", svgId: "arco_verde", details: "Na Festa da Misericórdia, visita cidade gerida por aliado da governadora Raquel Lyra." },
+        { date: "12 abr tarde", month: "Abril", location: "Canhotinho", region: "Agreste", svgId: "canhotinho", details: "O giro pelo Agreste Meridional termina em visita à prefeita aliada da base socialista." },
+        { date: "13 abr", month: "Abril", location: "Gravatá", region: "Agreste", svgId: "gravata", details: "João começa a segunda semana avançando sobre territory adversário." },
+        { date: "13 abr", month: "Abril", location: "Vitória de Santo Antão", region: "Zona da Mata", svgId: "vitoria_de_santo_antao", details: "Agenda segue para polo estratégico da Zona da Mata." },
+        { date: "14 abr", month: "Abril", location: "Recife", region: "RMR", svgId: "recife", details: "Retorno à capital pernambucana para reuniões e articulações políticas." },
+        { date: "17–26 abr", month: "Abril", location: "Exterior", region: "Internacional", svgId: "exterior", details: "Viagem particular com Tabata Amaral. Retorno previsto para domingo (26)." },
+        { date: "30 abr", month: "Abril", location: "Garanhuns", region: "Agreste", svgId: "garanhuns", details: "Recebe título de cidadão garanhuense, visita Hospital do Amor e participa do Festival Viva Garanhuns." },
+        { date: "02 mai", month: "Maio", location: "Goiana", region: "Zona da Mata", svgId: "goiana", details: "Suspende agendas festivas de 1° de maio após chuvas e acompanha a situação a partir de Goiana." },
+        { date: "04 mai", month: "Maio", location: "Brasília", region: "Federal", svgId: "exterior", details: "Viagem a Brasília em meio à mobilização nacional ligada às chuvas." },
+        { date: "05 mai", month: "Maio", location: "Recife", region: "RMR", svgId: "recife", details: "Retorno a Pernambuco para receber apoios de políticos e focar nas articulações." },
+        { date: "08 mai", month: "Maio", location: "Santa Cruz do Capibaribe", region: "Agreste", svgId: "santa_cruz_do_capibaribe", details: "Visita importante polo de confecções do Agreste, liderado por aliado de Raquel Lyra." },
+        { date: "09 mai", month: "Maio", location: "Surubim e Limoeiro", region: "Agreste", svgId: "surubim", details: "João visita cidades aliadas de Raquel Lyra junto com Humberto Costa." },
+        { date: "10 mai", month: "Maio", location: "Tracunhaém", region: "Zona da Mata", svgId: "tracunhaem", details: "Visita feira regional de artesanato e destaca histórico familiar, junto com Carlos Costa." },
+        { date: "14 mai", month: "Maio", location: "Abreu e Lima", region: "RMR", svgId: "abreu_e_lima", details: "João comparece ao aniversário do município de Abreu e Lima." },
+        { date: "16 mai", month: "Maio", location: "Carpina", region: "Zona da Mata", svgId: "carpina", details: "João vai a Carpina para encontrar com figuras políticas da região." },
+        { date: "16 mai", month: "Maio", location: "São Lourenço da Mata", region: "RMR", svgId: "sao_lourenco_da_mata", details: "Participa de ato de apoio liderado pelo prefeito Vinicius Labanca." },
+        { date: "17 mai", month: "Maio", location: "Nazaré da Mata", region: "Zona da Mata", svgId: "nazare_da_mata", details: "João visita a cidade no aniversário de 193 anos do município." },
+        { date: "17 mai", month: "Maio", location: "Bom Jardim", region: "Zona da Mata", svgId: "bom_jardim", details: "Participa de posse do Sindicato dos Trabalhadores e Trabalhadoras Rurais (STR) de Bom Jardim." },
+        { date: "19 mai", month: "Maio", location: "Lajedo", region: "Agreste", svgId: "lajedo", details: "Participa de comemoração de aniversário da cidade e inaugura escola municipal." },
+        { date: "19 mai", month: "Maio", location: "Jupi", region: "Agreste", svgId: "jupi", details: "João vai para comemoração com a prefeita Rivalda Freire (PSD), que declarou apoio ao socialista." },
+        { date: "21 mai", month: "Maio", location: "Olinda", region: "RMR", svgId: "olinda", details: "Visita Mercado em Olinda com Vinicius Castello, Eugênia Lima, Marília Arraes e Carlos Costa." },
+        { date: "23 mai", month: "Maio", location: "Dormentes", region: "Sertão", svgId: "dormentes", details: "João Campos visita o Caprishow." },
+        { date: "29 mai", month: "Maio", location: "Serra Talhada", region: "Sertão", svgId: "serra_talhada", details: "Participa de entregas do Governo Federal e afirma que Lula deve vir fazer campanha em Pernambuco." },
+        { date: "30 mai", month: "Maio", location: "Salgueiro", region: "Sertão", svgId: "salgueiro", details: "Defende que o estado assuma a Transnordestina." },
+        { date: "31 mai", month: "Maio", location: "São José do Belmonte", region: "Sertão", svgId: "sao_jose_do_belmonte", details: "Participa da cavalgada à Pedra do Reino junto com a esposa e aliados." },
+        { date: "04 jun", month: "Junho", location: "Tamandaré e Recife", region: "Mata Sul", svgId: "tamandare", details: "Faz entregas para saúde e defende duplicação da PE-60. Reunião com empresários da Fiepe." },
+        { date: "05 jun", month: "Junho", location: "Pedra", region: "Agreste", svgId: "pedra", details: "Promete pavimentação da PE-244 junto ao prefeito aliado Junior Vaz." },
+        { date: "05 jun", month: "Junho", location: "São Bento do Una", region: "Agreste", svgId: "sao_bento_do_una", details: "Recebe título de cidadão da cidade do aliado Alexandre Batité (MDB)." },
+        { date: "06 jun", month: "Junho", location: "Bom Conselho", region: "Agreste", svgId: "bom_conselho", details: "Anuncia proposta para rede de atendimento a crianças neurodivergentes." },
+        { date: "06 jun", month: "Junho", location: "Petrolândia", region: "Sertão", svgId: "petrolandia", details: "Propõe Hospital Regional. Participa de entregas com o prefeito Fabiano Marques." },
+        { date: "07 jun", month: "Junho", location: "Betânia e Flores", region: "Sertão", svgId: "betania", details: "Foi recepcionado pelo prefeito Bebe Água (PSB) em Betânia." },
+        { date: "08 jun", month: "Junho", location: "Itaíba e Águas Belas", region: "Agreste", svgId: "itaiba", details: "Agenda prevista na região do Agreste Meridional." }
     ];
 
     let currentIndex = 0;
+    let activeMonth  = "Todos";
+    const months = ["Todos", "Abril", "Maio", "Junho"];
 
-    const avatar = document.getElementById('joao-avatar');
-    const cardDate = document.getElementById('card-date');
-    const cardLocation = document.getElementById('card-location');
-    const cardDetails = document.getElementById('card-details');
-    const dateRange = document.getElementById('dateRange');
-    const prevBtn = document.getElementById('prevBtn');
-    const nextBtn = document.getElementById('nextBtn');
-    const markersContainer = document.getElementById('city-markers');
-    const infoCard = document.getElementById('info-card');
-
-    // Pega o centro exato da cidade renderizada usando GetBoundingClientRect
-    function getCoords(svgId) {
-        if (svgId === 'exterior') {
-            // Joga o avatar para fora da tela (simulando viagem internacional)
-            return { x: 150, y: -50 };
-        }
-
-        const pathElement = document.getElementById(svgId);
-        if (!pathElement) {
-            console.warn("Cidade não encontrada no SVG: " + svgId);
-            return { x: 50, y: 50 }; // Fallback para o centro do mapa
-        }
-        
-        const rect = pathElement.getBoundingClientRect();
-        const mapRect = document.getElementById('map-area').getBoundingClientRect();
-        
-        return {
-            x: ((rect.left + (rect.width / 2) - mapRect.left) / mapRect.width) * 100,
-            y: ((rect.top + (rect.height / 2) - mapRect.top) / mapRect.height) * 100
-        };
+    // Retorna os índices globais filtrados com base no mês selecionado
+    function filteredList() {
+        if (activeMonth === "Todos") return itinerary.map((_, i) => i);
+        return itinerary.reduce((acc, current, i) => { 
+            if (current.month === activeMonth) acc.push(i); 
+            return acc; 
+        }, []);
     }
 
-    // Atualiza a posição de todos os pontinhos de marcação
-    function updateDots() {
-        const dots = document.querySelectorAll('.city-dot');
-        itinerary.forEach((item, index) => {
-            if (dots[index]) {
-                if (item.svgId === 'exterior') {
-                    dots[index].style.display = 'none'; // Esconde o ponto no mapa
-                } else {
-                    const coords = getCoords(item.svgId);
-                    dots[index].style.display = 'block';
-                    dots[index].style.left = coords.x + '%';
-                    dots[index].style.top = coords.y + '%';
-                }
+    // Mapeia a posição do ponto com base na transformação real do SVG renderizado
+    function getCoords(svgId) {
+        if (svgId === 'exterior') {
+            return { x: 85, y: -15 }; // Posiciona o avatar de forma elegante no canto superior direito para viagens fora do estado
+        }
+
+        const svg = document.getElementById('mapa-pe');
+        const el = document.getElementById(svgId);
+        if (!svg || !el) return { x: 50, y: 45 }; // Fallback para o centro caso o id não exista no SVG
+
+        try {
+            const box = el.getBBox();
+            const pt = svg.createSVGPoint();
+            pt.x = box.x + box.width / 2;
+            pt.y = box.y + box.height / 2;
+
+            const ctm = svg.getScreenCTM();
+            const screenPt = ctm ? pt.matrixTransform(ctm) : pt;
+            const rect = svg.getBoundingClientRect();
+
+            if (!rect.width || !rect.height) {
+                return { x: 50, y: 45 };
+            }
+
+            return {
+                x: ((screenPt.x - rect.left) / rect.width) * 100,
+                y: ((screenPt.y - rect.top) / rect.height) * 100
+            };
+        } catch (err) {
+            console.warn("Erro ao ler BBox para: " + svgId, err);
+            return { x: 50, y: 45 };
+        }
+    }
+
+    // Renderiza as abas superiores de seleção de meses
+    function buildMonthBar() {
+        const bar = document.getElementById('month-bar');
+        bar.innerHTML = '';
+        months.forEach(m => {
+            const count = m === "Todos" ? itinerary.length : itinerary.filter(it => it.month === m).length;
+            const btn = document.createElement('button');
+            btn.className = 'month-btn' + (m === activeMonth ? ' active' : '');
+            btn.innerHTML = m + `<span class="mc">${count}</span>`;
+            
+            btn.addEventListener('click', () => {
+                activeMonth = m;
+                document.querySelectorAll('.month-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                const fl = filteredList();
+                if (!fl.includes(currentIndex)) currentIndex = fl[0] ?? 0;
+                
+                renderStopsList();
+                updateUI();
+            });
+            bar.appendChild(btn);
+        });
+    }
+
+    // Renderiza a lista de rolagem com as paradas filtradas
+    function renderStopsList() {
+        const list = document.getElementById('stops-list');
+        list.innerHTML = '';
+        const fl = filteredList();
+        
+        fl.forEach(globalIdx => {
+            const it = itinerary[globalIdx];
+            const row = document.createElement('div');
+            row.className = 'stop-row' 
+                + (globalIdx < currentIndex ? ' visited' : '') 
+                + (globalIdx === currentIndex ? ' active' : '');
+            
+            const color = REGION_COLORS[it.region] || '#555';
+            row.innerHTML = `
+                <div class="stop-dot-ui"></div>
+                <div class="stop-info">
+                    <div class="stop-info-date">${it.date}</div>
+                    <div class="stop-info-loc">${it.location}</div>
+                </div>
+                <span class="stop-region-pill" style="background:${color}">${it.region}</span>
+            `;
+            
+            row.addEventListener('click', () => {
+                currentIndex = globalIdx;
+                updateUI();
+            });
+            list.appendChild(row);
+        });
+
+        // Garante que a linha selecionada fique centralizada no scrollview
+        setTimeout(() => {
+            const activeRow = list.querySelector('.active');
+            if (activeRow) activeRow.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        }, 50);
+    }
+
+    // Atualiza o estado da interface, posicionamento do avatar e cards de informação
+    function updateUI() {
+        const it = itinerary[currentIndex];
+        
+        // Remove destaque anterior e adiciona à cidade ativa
+        document.querySelectorAll('#svg-map-container .active').forEach(e => e.classList.remove('active'));
+        const el = document.getElementById(it.svgId);
+        if (el) el.classList.add('active');
+
+        // Atualiza a posição do avatar dinamicamente
+        const coords = getCoords(it.svgId);
+        const avatar = document.getElementById('joao-avatar');
+        avatar.style.left = coords.x + '%';
+        avatar.style.top  = coords.y + '%';
+
+        // Anima e atualiza as informações do card
+        const card = document.getElementById('info-card');
+        card.style.opacity = '0';
+        setTimeout(() => {
+            document.getElementById('card-date').textContent     = it.date + ' de 2026';
+            document.getElementById('card-region').textContent   = it.region;
+            document.getElementById('card-location').textContent = it.location;
+            document.getElementById('card-details').textContent  = it.details;
+            card.style.opacity = '1';
+        }, 130);
+
+        // Atualiza barra de preenchimento do progresso
+        const percent = (currentIndex / (itinerary.length - 1)) * 100;
+        document.getElementById('progress-fill').style.width = percent + '%';
+
+        // Atualiza rótulo numérico do rodapé
+        document.getElementById('counter-lbl').innerHTML = `<strong>${currentIndex + 1}</strong> / ${itinerary.length}`;
+
+        // Controla os estados de ativação dos botões de anterior/próximo
+        document.getElementById('prevBtn').disabled = currentIndex === 0;
+        document.getElementById('nextBtn').disabled = currentIndex === itinerary.length - 1;
+
+        // Atualiza visualmente a lista de rotas
+        document.querySelectorAll('.stop-row').forEach(row => {
+            const idx = parseInt(row.getAttribute('data-idx'));
+            row.classList.remove('active', 'visited');
+            if (idx === currentIndex) row.classList.add('active');
+            else if (idx < currentIndex) row.classList.add('visited');
+        });
+    }
+
+    // Renderiza e posiciona os pontinhos azuis estáticos no mapa de fundo
+    function initDots() {
+        const container = document.getElementById('city-markers');
+        container.innerHTML = '';
+        itinerary.forEach(it => {
+            if (it.svgId !== 'exterior') {
+                const dot = document.createElement('div');
+                dot.className = 'city-dot';
+                const coords = getCoords(it.svgId);
+                dot.style.left = coords.x + '%';
+                dot.style.top  = coords.y + '%';
+                container.appendChild(dot);
             }
         });
     }
 
-    // Cria os pontos de referência no mapa
-    function initMarkers() {
-        itinerary.forEach(() => {
-            const dot = document.createElement('div');
-            dot.className = 'city-dot';
-            markersContainer.appendChild(dot);
-        });
-        updateDots();
-    }
-
-    function updateUI() {
-        const item = itinerary[currentIndex];
-        
-        // Remove o destaque de todas as cidades no SVG e destaca a atual
-        document.querySelectorAll('#svg-map-container .active').forEach(el => el.classList.remove('active'));
-        const activePath = document.getElementById(item.svgId);
-        if (activePath) activePath.classList.add('active');
-
-        // Calcula as coordenadas atuais da cidade e movimenta o avatar
-        const coords = getCoords(item.svgId);
-        avatar.style.left = coords.x + '%';
-        avatar.style.top = coords.y + '%';
-
-        // Atualiza as informações do card
-        infoCard.style.opacity = '0';
-        
-        setTimeout(() => {
-            cardDate.innerText = item.date + " de 2026";
-            cardLocation.innerText = item.location + " (" + item.region + ")";
-            cardDetails.innerText = item.details;
-            infoCard.style.opacity = '1';
-        }, 150);
-
-        // Ajusta o estado dos controles
-        dateRange.value = currentIndex;
-        prevBtn.disabled = currentIndex === 0;
-        nextBtn.disabled = currentIndex === itinerary.length - 1;
-    }
-
-    // Navegação via botões
-    prevBtn.addEventListener('click', () => {
+    // Eventos de clique nas setas de navegação do rodapé
+    document.getElementById('prevBtn').addEventListener('click', () => {
         if (currentIndex > 0) {
             currentIndex--;
             updateUI();
         }
     });
 
-    nextBtn.addEventListener('click', () => {
+    document.getElementById('nextBtn').addEventListener('click', () => {
         if (currentIndex < itinerary.length - 1) {
             currentIndex++;
             updateUI();
         }
     });
 
-    // Navegação via barra de progresso
-    dateRange.addEventListener('input', (e) => {
-        currentIndex = parseInt(e.target.value);
-        updateUI();
-    });
-
-    // Navegação via teclado (setas esquerda/direita)
-    document.addEventListener('keydown', (e) => {
-        if (e.key === "ArrowLeft" && currentIndex > 0) {
+    // Atalhos de teclado (Setas Direita e Esquerda)
+    document.addEventListener('keydown', e => {
+        if (e.key === 'ArrowLeft' && currentIndex > 0) {
             currentIndex--;
             updateUI();
-        } else if (e.key === "ArrowRight" && currentIndex < itinerary.length - 1) {
+        }
+        if (e.key === 'ArrowRight' && currentIndex < itinerary.length - 1) {
             currentIndex++;
             updateUI();
         }
     });
 
-    // Recalcula posições ao redimensionar a tela para que os pontos não saiam da cidade correta
-    window.addEventListener('resize', () => {
-        updateDots();
-        const coords = getCoords(itinerary[currentIndex].svgId);
-        avatar.style.left = coords.x + '%';
-        avatar.style.top = coords.y + '%';
-    });
-
-    // Início da aplicação
+    // Execução inicial do app assim que a janela carregar
     window.onload = () => {
-        dateRange.max = itinerary.length - 1;
-        initMarkers();
-        updateUI();
+        buildMonthBar();
+        renderStopsList();
+        // O timeout de 200ms garante que o navegador renderizou o SVG e as medidas de getBBox estarão disponíveis
+        setTimeout(() => {
+            initDots();
+            updateUI();
+        }, 200);
     };
-
 </script>
 
 </body>
